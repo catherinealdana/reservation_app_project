@@ -7,7 +7,67 @@ const service = require("./reservations.service");
  * 
  */
 
-//VALIDATE FUNCTIONS 
+
+
+
+//CRUD controller functions 
+
+
+//to retrieve list of reservations by phone number 
+
+async function list(req, res) {
+  const { date, mobile_number } = req.query;
+  let reservations;
+  if (mobile_number) {
+    reservations = await service.search(mobile_number);
+  } else {
+    reservations = date ? await service.listByDate(date) : await service.list();
+  }
+  res.json({
+    data: reservations,
+    
+  });
+}
+
+
+//creation reservation controller 
+
+async function create(req, res) {
+  const reservation = req.body.data;
+  const { reservation_id } = await service.create(reservation);
+  reservation.reservation_id = reservation_id;
+  res.status(201).json({ data: reservation });
+}
+
+//read reservation 
+
+async function read(req, res) {
+  const reservation = res.locals.reservation;
+  res.json({ data: reservation });
+}
+
+//update reservation 
+
+async function update(req, res, next) {
+  const { reservation_Id } = req.params;
+  const { status } = req.body.data;
+  const reservation = await service.update(reservation_Id, status);
+  res.json({ data: reservation });
+}
+
+//modify reservation 
+
+async function modify(req, res, next) {
+  const { reservation_Id } = req.params;
+  const reservation = req.body.data;
+  const data = await service.modify(reservation_Id, reservation);
+  reservation.reservation_id = data.reservation_id;
+  res.json({ data: reservation });
+}
+
+
+
+//VALIDATE FUNCTIONS/ MIDDLEWARE 
 
 //variable to wrap fields and use to validate functions 
 
@@ -68,64 +128,6 @@ function isValidReservation(req, res, next) {
 
   next();
 }
-
-
-//CRUD controller functions 
-
-
-//to retrieve list of reservations by phone number 
-
-async function list(req, res) {
-  const { date, mobile_number } = req.query;
-  let reservations;
-  if (mobile_number) {
-    reservations = await service.search(mobile_number);
-  } else {
-    reservations = date ? await service.listByDate(date) : await service.list();
-  }
-  res.json({
-    data: reservations,
-    
-  });
-}
-
-
-//creation reservation controller 
-
-async function create(req, res) {
-  const reservation = req.body.data;
-  const { reservation_id } = await service.create(reservation);
-  reservation.reservation_id = reservation_id;
-  res.status(201).json({ data: reservation });
-}
-
-//read reservation 
-
-async function read(req, res) {
-  const reservation = res.locals.reservation;
-  res.json({ data: reservation });
-}
-
-//update reservation 
-
-async function update(req, res, next) {
-  const { reservation_Id } = req.params;
-  const { status } = req.body.data;
-  const reservation = await service.update(reservation_Id, status);
-  res.json({ data: reservation });
-}
-
-//modify reservation 
-
-async function modify(req, res, next) {
-  const { reservation_Id } = req.params;
-  const reservation = req.body.data;
-  const data = await service.modify(reservation_Id, reservation);
-  reservation.reservation_id = data.reservation_id;
-  res.json({ data: reservation });
-}
-
-
 
 
 
