@@ -7,59 +7,6 @@ const service = require("./reservations.service");
  * 
  */
 
-
-//CRUD controller functions 
-
-//creation reservation controller 
-
-async function create(req, res) {
-  const reservation = req.body.data;
-  const { reservation_id } = await service.create(reservation);
-  reservation.reservation_id = reservation_id;
-  res.status(201).json({ data: reservation });
-}
-
-//read reservation 
-
-async function read(req, res) {
-  const reservation = res.locals.reservation;
-  res.json({ data: reservation });
-}
-
-//update reservation 
-
-async function update(req, res, next) {
-  const { reservation_Id } = req.params;
-  const { status } = req.body.data;
-  const reservation = await service.update(reservation_Id, status);
-  res.json({ data: reservation });
-}
-
-//modify reservation 
-
-async function modify(req, res, next) {
-  const { reservation_Id } = req.params;
-  const reservation = req.body.data;
-  const data = await service.modify(reservation_Id, reservation);
-  reservation.reservation_id = data.reservation_id;
-  res.json({ data: reservation });
-}
-
-//to retrieve list of reservations by phone number 
-
-async function list(req, res) {
-  const { date, mobile_number } = req.query;
-  let reservations;
-  if (mobile_number) {
-    reservations = await service.search(mobile_number);
-  } else {
-    reservations = date ? await service.listByDate(date) : await service.list();
-  }
-  res.json({
-    data: reservations,
-  });
-}
-
 //VALIDATE FUNCTIONS 
 
 //variable to wrap fields and use to validate functions 
@@ -105,10 +52,7 @@ function isValidReservation(req, res, next) {
     }
 
     if (field === "people" && typeof reservation[field] !== "number") {
-      return next({
-        status: 400,
-        message: "people is not a number", // Update the error message here
-      });
+      return next({status: 400,message: "people is not a number", });
     }
 
     if (field === "reservation_date" && !Date.parse(reservation[field])) {
@@ -125,6 +69,66 @@ function isValidReservation(req, res, next) {
   next();
 }
 
+
+//CRUD controller functions 
+
+
+//to retrieve list of reservations by phone number 
+
+async function list(req, res) {
+  const { date, mobile_number } = req.query;
+  let reservations;
+  if (mobile_number) {
+    reservations = await service.search(mobile_number);
+  } else {
+    reservations = date ? await service.listByDate(date) : await service.list();
+  }
+  res.json({
+    data: reservations,
+    
+  });
+}
+
+
+//creation reservation controller 
+
+async function create(req, res) {
+  const reservation = req.body.data;
+  const { reservation_id } = await service.create(reservation);
+  reservation.reservation_id = reservation_id;
+  res.status(201).json({ data: reservation });
+}
+
+//read reservation 
+
+async function read(req, res) {
+  const reservation = res.locals.reservation;
+  res.json({ data: reservation });
+}
+
+//update reservation 
+
+async function update(req, res, next) {
+  const { reservation_Id } = req.params;
+  const { status } = req.body.data;
+  const reservation = await service.update(reservation_Id, status);
+  res.json({ data: reservation });
+}
+
+//modify reservation 
+
+async function modify(req, res, next) {
+  const { reservation_Id } = req.params;
+  const reservation = req.body.data;
+  const data = await service.modify(reservation_Id, reservation);
+  reservation.reservation_id = data.reservation_id;
+  res.json({ data: reservation });
+}
+
+
+
+
+
 // to verify reservation is finished 
 
 function finishedReservation(req, res, next) {
@@ -137,6 +141,37 @@ function finishedReservation(req, res, next) {
   }
   next();
 }
+
+
+//to verify is not Tuesday 
+
+function isNotTuesday(req, res, next) {
+  const { reservation_date } = req.body.data;
+  console.log("date", reservation_date)
+  const [year, month, day] = reservation_date.split("-");
+  const date = new Date(`${month} ${day}, ${year}`);
+  res.locals.date = date;
+  if (date.getDay() === 2) {
+    console.log("tuesday validation failed")
+    return next({ status: 400, message: "Location is closed on Tuesdays" });
+  }
+  next();
+}
+
+// to verify reservations are future only
+
+function isFutureOnly(req, res, next) {
+  const date = res.locals.date;
+  const today = new Date();
+  console.log("reservationdate", date);
+  console.log("today", today)
+  if (date < today) {
+    console.log("tuesday validation failed")
+    return next({ status: 400, message: "Must be a future date" });
+  }
+  next();
+}
+
 
 //to verify reservation exists 
 
@@ -155,24 +190,36 @@ const reservationExists = async (req, res, next) => {
 };
 
 
+
+
+
+
 module.exports = {
   list: asyncErrorBoundary(list),
   create: [
     asyncErrorBoundary(isValidReservation),
+    isNotTuesday,
+    isFutureOnly,
     asyncErrorBoundary(create),
+    
   ],
   read: [
     asyncErrorBoundary(reservationExists),
-    asyncErrorBoundary(read)
+    asyncErrorBoundary(read),
   ],
   update:[
     asyncErrorBoundary(reservationExists),
     asyncErrorBoundary(update),
     finishedReservation,
+   
   ],
   modify:[
     isValidReservation,
+    isNotTuesday,
+    isFutureOnly,
     asyncErrorBoundary(reservationExists),
     asyncErrorBoundary(modify),
+  
+
   ],
 };
