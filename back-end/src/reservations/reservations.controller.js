@@ -151,7 +151,7 @@ function isNotTuesday(req, res, next) {
   const { reservation_date } = req.body.data;
   console.log("date", reservation_date)
   const [year, month, day] = reservation_date.split("-");
-  const date = new Date(`${month} ${day}, ${year}`);
+  const date = new Date(`${month}-${day}-${year}`);
   res.locals.date = date;
   if (date.getDay() === 2) {
     console.log("tuesday validation failed")
@@ -192,6 +192,44 @@ const reservationExists = async (req, res, next) => {
 };
 
 
+// to verify is within open hours 
+
+function isWithinOpenHours(req, res, next) {
+  const reservation = req.body.data;
+  const [hour, minute] = reservation.reservation_time.split(":");
+  const parsedHour = parseInt(hour, 10);
+  const parsedMinute = parseInt(minute, 10);
+  
+  const openingHour = 10; 
+  const closingHour = 21;
+  
+  const currentHour = new Date().getHours();
+  const currentMinute = new Date().getMinutes();
+  
+  const reservationTime = parsedHour * 60 + parsedMinute;
+  const closingTime = closingHour * 60 + 30; 
+  
+  if (parsedHour < openingHour || parsedHour > closingHour) {
+    return next({
+      status: 400,
+      message: "Reservation must be made within business hours",
+    });
+  }
+  
+  if (
+    parsedHour === closingHour && reservationTime > closingTime ||
+    currentHour > parsedHour || (currentHour === parsedHour && currentMinute > parsedMinute)
+  ) {
+    return next({
+      status: 400,
+      message: "Reservation must be made at least 60 minutes before closing",
+    });
+  }
+  
+  next();
+}
+
+
 
 
 
@@ -202,6 +240,7 @@ module.exports = {
     asyncErrorBoundary(isValidReservation),
     isNotTuesday,
     isFutureOnly,
+    isWithinOpenHours,
     asyncErrorBoundary(create),
     
   ],
@@ -219,6 +258,7 @@ module.exports = {
     isValidReservation,
     isNotTuesday,
     isFutureOnly,
+    isWithinOpenHours,
     asyncErrorBoundary(reservationExists),
     asyncErrorBoundary(modify),
   
