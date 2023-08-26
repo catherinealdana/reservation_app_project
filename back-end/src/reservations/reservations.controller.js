@@ -192,24 +192,13 @@ const reservationExists = async (req, res, next) => {
 };
 
 
-// to verify is within open hours 
+// to verify is within open hours
 
 function isWithinOpenHours(req, res, next) {
   const reservation = req.body.data;
   const [hour, minute] = reservation.reservation_time.split(":");
-  const parsedHour = parseInt(hour, 10);
-  const parsedMinute = parseInt(minute, 10);
   
-  const openingHour = 10; 
-  const closingHour = 21;
-  
-  const currentHour = new Date().getHours();
-  const currentMinute = new Date().getMinutes();
-  
-  const reservationTime = parsedHour * 60 + parsedMinute;
-  const closingTime = closingHour * 60 + 30; 
-  
-  if (parsedHour < openingHour || parsedHour > closingHour) {
+  if (hour < 10 || hour > 20) {
     return next({
       status: 400,
       message: "Reservation must be made within business hours",
@@ -217,17 +206,18 @@ function isWithinOpenHours(req, res, next) {
   }
   
   if (
-    parsedHour === closingHour && reservationTime > closingTime ||
-    currentHour > parsedHour || (currentHour === parsedHour && currentMinute > parsedMinute)
+    (hour === 10 && minute < 30) ||  
+    (hour === 20 && minute > 30)      
   ) {
     return next({
       status: 400,
-      message: "Reservation must be made at least 60 minutes before closing",
+      message: "Reservation must be made within business hours",
     });
   }
   
   next();
 }
+
 
 
 
