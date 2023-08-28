@@ -48,7 +48,7 @@ async function read(req, res) {
 
 //update reservation 
 
-async function update(req, res) {
+async function update(req, res, next) {
   const { reservation_Id } = req.params;
   const { status } = req.body.data;
   const reservation = await service.update(reservation_Id, status);
@@ -57,7 +57,7 @@ async function update(req, res) {
 
 //modify reservation 
 
-async function modify(req, res ) {
+async function modify(req, res, next) {
   const { reservation_Id } = req.params;
   const reservation = req.body.data;
   const data = await service.modify(reservation_Id, reservation);
@@ -103,7 +103,7 @@ function isValidReservation(req, res, next) {
   const reservation = req.body.data;
 
   if (!reservation) {
-    return next({ status: 400, message: `There is no data` });
+    return next({ status: 400, message: `Reservation does not exist.` });
   }
 
   validReservationFields.forEach((field) => {
@@ -112,7 +112,7 @@ function isValidReservation(req, res, next) {
     }
 
     if (field === "people" && typeof reservation[field] !== "number") {
-      return next({status: 400,message: "Number of people must be a numeric value.", });
+      return next({status: 400,message: "people is not a number", });
     }
 
     if (field === "reservation_date" && !Date.parse(reservation[field])) {
@@ -165,6 +165,8 @@ function isNotTuesday(req, res, next) {
 function isFutureOnly(req, res, next) {
   const date = res.locals.date;
   const today = new Date();
+  console.log("reservationdate", date);
+  console.log("today", today)
   if (date < today) {
     console.log("tuesday validation failed")
     return next({ status: 400, message: "Must be a future date" });
