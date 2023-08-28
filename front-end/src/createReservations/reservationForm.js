@@ -34,25 +34,6 @@ function ReservationForm() {
         isFutureOnly(date, errors);
       };
 
-    // const handleFormSubmit = async (event) => {
-    //     event.preventDefault();
-    //     const controller = new AbortController();
-    //     const errors = [];
-    //     findErrors(formData.reservation_date, errors);
-    //     if (errors.length) {
-    //       setReservationsError({ message: errors });
-    //       return;
-    //     }
-    //     try {
-    //       formData.people = Number(formData.people);
-    //       await createReservation(formData, controller.signal);
-    //       const date = formData.reservation_date;
-    //       history.push(`/dashboard?date=${date}`);
-    //     } catch (error) {
-    //       setReservationsError(error);
-    //     }
-    //     return () => controller.abort();
-    //   };
     
     const handleFormSubmit = async (event) => {
         event.preventDefault();
@@ -99,6 +80,7 @@ function ReservationForm() {
         return () => controller.abort();
       };
       
+    
     
     return (
         <form onSubmit={handleFormSubmit} className="my-4">
