@@ -112,7 +112,7 @@ function isValidReservation(req, res, next) {
     }
 
     if (field === "people" && typeof reservation[field] !== "number") {
-      return next({status: 400,message: "Number of people must be a numeric value.", });
+      return next({status: 400,message: "people is not a number", });
     }
 
     if (field === "reservation_date" && !Date.parse(reservation[field])) {
@@ -145,33 +145,6 @@ function finishedReservation(req, res, next) {
 }
 
 
-//to verify is not Tuesday 
-
-function isNotTuesday(req, res, next) {
-  const { reservation_date } = req.body.data;
-  console.log("date", reservation_date)
-  const [year, month, day] = reservation_date.split("-");
-  const date = new Date(`${month}-${day}-${year}`);
-  res.locals.date = date;
-  if (date.getDay() === 2) {
-    console.log("tuesday validation failed")
-    return next({ status: 400, message: "Location is closed on Tuesdays" });
-  }
-  next();
-}
-
-// to verify reservations are future only
-
-function isFutureOnly(req, res, next) {
-  const date = res.locals.date;
-  const today = new Date();
-  if (date < today) {
-    console.log("tuesday validation failed")
-    return next({ status: 400, message: "Must be a future date" });
-  }
-  next();
-}
-
 
 //to verify reservation exists 
 
@@ -190,34 +163,6 @@ const reservationExists = async (req, res, next) => {
 };
 
 
-// to verify is within open hours
-
-function isWithinOpenHours(req, res, next) {
-  const reservation = req.body.data;
-  const [hour, minute] = reservation.reservation_time.split(":");
-  
-  if (hour < 10 || hour > 20) {
-    return next({
-      status: 400,
-      message: "Reservation must be made within business hours",
-    });
-  }
-  
-  if (
-    (hour === 10 && minute < 30) ||  
-    (hour === 20 && minute > 30)      
-  ) {
-    return next({
-      status: 400,
-      message: "Reservation must be made within business hours",
-    });
-  }
-  
-  next();
-}
-
-
-
 
 
 
@@ -226,9 +171,6 @@ module.exports = {
   list: asyncErrorBoundary(list),
   create: [
     asyncErrorBoundary(isValidReservation),
-    isNotTuesday,
-    isFutureOnly,
-    isWithinOpenHours,
     asyncErrorBoundary(create),
     
   ],
@@ -244,9 +186,6 @@ module.exports = {
   ],
   modify:[
     isValidReservation,
-    isNotTuesday,
-    isFutureOnly,
-    isWithinOpenHours,
     asyncErrorBoundary(reservationExists),
     asyncErrorBoundary(modify),
   
