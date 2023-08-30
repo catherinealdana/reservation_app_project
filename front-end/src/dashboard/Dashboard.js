@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { listReservations } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import { previous, next } from "../utils/date-time";
+import ListTables from "./listTables"
+import { listAllReservations,listAllTables } from "../utils/api";
+import ReservationList from "./listReservation"
+
 
 /**
  * Defines the dashboard page.
@@ -11,18 +14,22 @@ import { previous, next } from "../utils/date-time";
  * @returns {JSX.Element}
  */
 function Dashboard({ date }) {
-  //const [reservations, setReservations] = useState([]);
+  const [reservations, setReservations] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
   const history= useHistory();
+  const [tables, setTables]= useState([]);
 
   useEffect(loadDashboard, [date]);
 
   function loadDashboard() {
     const abortController = new AbortController();
     setReservationsError(null);
-    listReservations({ date }, abortController.signal)
-       // .then(setReservations)
+    listAllReservations({ date }, abortController.signal)
+        .then(setReservations)
+        .then(listAllTables)
+        .then(setTables)
         .catch(setReservationsError);
+        
     return () => abortController.abort();
   }
 
@@ -45,22 +52,30 @@ function Dashboard({ date }) {
 
   return (
     <main>
-      <h1>Dashboard</h1>
-      <div className="d-md-flex mb-3">
+      <h1 className="d-md-flex justify-content-center">Dashboard</h1>
+      <div className="d-md-flex mb-3 justify-content-center">
         <h4 className="mb-0">Reservations for {date}</h4>
       </div>
       <div className="pb-2 d-flex justify-content-center">
         <button className="btn btn-primary mr-1" onClick={handlePreviousDay}>
-          Previous
+          previous
         </button>
         <button className="btn btn-primary mr-1" onClick={handleToday}>
-          Today
+          today
         </button>
-        <button className="btn btn-primary mr-1" onClick={handleNextDay}>
-          Next 
+        <button className="btn btn-primary" onClick={handleNextDay}>
+          next
         </button>
       </div>
       <ErrorAlert error={reservationsError} />
+      <ReservationList
+        reservations={reservations}
+        setReservations={setReservations}
+        setError={setReservationsError}
+      />
+      <div>
+        <ListTables tables={tables} loadDashboard={loadDashboard} />
+      </div>
     </main>
   );
 }
