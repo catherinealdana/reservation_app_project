@@ -71,7 +71,7 @@ async function modify(req, res ) {
 
 //variable to wrap fields and use to validate functions 
 
-const validReservationFields = [
+const _VALID_RESERVATION_FIELDS = [
   "first_name",
   "last_name",
   "mobile_number",
@@ -103,10 +103,10 @@ function isValidReservation(req, res, next) {
   const reservation = req.body.data;
 
   if (!reservation) {
-    return next({ status: 400, message: `There is no data` });
+    return next({ status: 400, message: `Required data attribute.` });
   }
 
-  validReservationFields.forEach((field) => {
+  _VALID_RESERVATION_FIELDS.forEach((field) => {
     if (!reservation[field]) {
       return next({ status: 400, message: `${field} field required` });
     }
@@ -121,7 +121,7 @@ function isValidReservation(req, res, next) {
 
     if (field === "reservation_time") {
       if (!validateTime(reservation[field])) {
-        return next({ status: 400, message: `${field} is not a valid time` });
+        return next({ status: 400, message: `${field} is not a valid time.` });
       }
     }
   });
@@ -155,7 +155,7 @@ function isNotTuesday(req, res, next) {
   res.locals.date = date;
   if (date.getDay() === 2) {
     console.log("tuesday validation failed")
-    return next({ status: 400, message: "Location is closed on Tuesdays" });
+    return next({ status: 400, message: "Location is closed on Tuesdays." });
   }
   next();
 }
@@ -167,7 +167,7 @@ function isFutureOnly(req, res, next) {
   const today = new Date();
   if (date < today) {
     console.log("tuesday validation failed")
-    return next({ status: 400, message: "Must be a future date" });
+    return next({ status: 400, message: "Must be a future date." });
   }
   next();
 }
@@ -199,7 +199,7 @@ function isWithinOpenHours(req, res, next) {
   if (hour < 10 || hour > 20) {
     return next({
       status: 400,
-      message: "Reservation must be made within business hours",
+      message: "Reservation must be made within business hours.",
     });
   }
   

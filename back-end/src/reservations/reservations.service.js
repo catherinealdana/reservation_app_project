@@ -14,7 +14,9 @@ async function create(reservation) {
 //Read list of reservations 
 
 function read(reservation_id) {
-    return knex("reservations").select("*").where({ reservation_id }).first();
+    return knex("reservations")
+      .select("*")
+      .where({ reservation_id }).first();
   }
 
 
