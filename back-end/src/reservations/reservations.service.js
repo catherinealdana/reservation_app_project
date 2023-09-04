@@ -25,6 +25,7 @@ function read(reservation_id) {
 async function list() {
     return knex("reservations")
       .select("*")
+      .whereNotIn("status",["finished","cancelled"])
       .orderBy("reservations.reservation_date");
   }
 
@@ -34,6 +35,7 @@ function listByDate(reservation_date) {
     return knex("reservations")
       .select("*")
       .where({ reservation_date })
+      .whereNotIn("status", ["finished", "cancelled"])
       .orderBy("reservations.reservation_time");
   }
 

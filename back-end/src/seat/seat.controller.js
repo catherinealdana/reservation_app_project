@@ -88,11 +88,22 @@ async function ifTableAvailable(req, res, next) {
 }
 
 
+// is the reservation is already seated 
+
+function reservationSeated (req, res, next) {
+    const { status } = res.locals.reservation;
+    if (status === "seated") {
+      return next({ status: 400, message: "Reservation is already seated" });
+      }
+    next();
+}
+
 
 module.exports = {
   update: [
     hasReservationId,
     asyncErrorBoundary(reservationExists),
+    reservationSeated,
     asyncErrorBoundary(isValidTable),
     asyncErrorBoundary(update),
   ],

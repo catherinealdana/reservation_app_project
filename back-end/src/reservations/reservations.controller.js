@@ -130,21 +130,6 @@ function isValidReservation(req, res, next) {
 }
 
 
-
-// to verify reservation is finished 
-
-function finishedReservation(req, res, next) {
-  const { status } = res.locals.reservation;
-  if (status === "finished") {
-    return next({
-      status: 400,
-      message: "Reservation is already finished.",
-    });
-  }
-  next();
-}
-
-
 //to verify is not Tuesday 
 
 function isNotTuesday(req, res, next) {
@@ -217,7 +202,7 @@ function isWithinOpenHours(req, res, next) {
 }
 
 
-
+// to check if the reservation's status 
   
 function isValidStatus(req, res, next) {
   const VALID_STATUSES = ["booked", "seated", "finished", "cancelled"];
@@ -229,7 +214,34 @@ function isValidStatus(req, res, next) {
 }
 
 
+// to check if the reservation has a booked status 
 
+function bookedStatus(req, res, next) {
+  const { status } = res.locals.reservation
+    ? res.locals.reservation
+    : req.body.data;
+  if (status === "seated" || status === "finished" || status === "cancelled") {
+    return next({
+      status: 400,
+      message: `New reservation can not have ${status} status.`,
+    });
+  }
+  next();
+}
+
+
+// to verify reservation is finished 
+
+function finishedReservation(req, res, next) {
+  const { status } = res.locals.reservation;
+  if (status === "finished") {
+    return next({
+      status: 400,
+      message: "Reservation is already finished.",
+    });
+  }
+  next();
+}
 
 
 
@@ -241,6 +253,7 @@ module.exports = {
     isNotTuesday,
     isFutureOnly,
     isWithinOpenHours,
+    bookedStatus,
     asyncErrorBoundary(create),
     
   ],
@@ -250,9 +263,9 @@ module.exports = {
   ],
   update:[
     asyncErrorBoundary(reservationExists),
-    asyncErrorBoundary(update),
+    isValidStatus,
     finishedReservation,
-   
+    asyncErrorBoundary(update),
   ],
   modify:[
     isValidReservation,
@@ -260,8 +273,7 @@ module.exports = {
     isFutureOnly,
     isWithinOpenHours,
     asyncErrorBoundary(reservationExists),
+    bookedStatus,
     asyncErrorBoundary(modify),
-  
-
   ],
 };
