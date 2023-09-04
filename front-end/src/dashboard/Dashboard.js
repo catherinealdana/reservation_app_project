@@ -1,12 +1,9 @@
 import React, { useEffect, useState } from "react";
 import ErrorAlert from "../layout/ErrorAlert";
-import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
-import { previous, next } from "../utils/date-time";
-import ListTables from "./listTables"
-import { listAllReservations,listAllTables } from "../utils/api";
-import ReservationList from "./listReservation"
-
-
+import {useHistory} from "react-router-dom"
+import { listReservations,listAllTables } from "../utils/api";
+import { previous,next } from "../utils/date-time";
+import ListTables from "./TablesinDashboard/listTables";
 /**
  * Defines the dashboard page.
  * @param date
@@ -15,63 +12,58 @@ import ReservationList from "./listReservation"
  */
 function Dashboard({ date }) {
   const [reservations, setReservations] = useState([]);
+  const [tables, setTables] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
-  const history= useHistory();
-  const [tables, setTables]= useState([]);
+  const history = useHistory();
 
   useEffect(loadDashboard, [date]);
 
   function loadDashboard() {
-    const abortController = new AbortController();
+    const controller = new AbortController();
     setReservationsError(null);
-    listAllReservations({ date }, abortController.signal)
-        .then(setReservations)
-        .then(listAllTables)
-        .then(setTables)
-        .catch(setReservationsError);
-        
-    return () => abortController.abort();
+    listReservations({ date }, controller.signal)
+      .then(setReservations)
+      .then(listAllTables)
+      .then(setTables)
+      .catch(setReservationsError);
+    return () => controller.abort();
   }
 
-  //handler functions by day 
-
-  function handlePreviousDay(){
-    const newDate= previous(date);
-    history.push(`/dashboard?date=${newDate}`);
-  }
-
-  function handleToday(){
+  function handleToday() {
     history.push(`/dashboard`);
   }
 
-  function handleNextDay(){
-    history.push(`/dashboard?date=${next(date)}`);
+  function handlePreviousDay() {
+    const newDate = previous(date);
+    history.push(`/dashboard?date=${newDate}`);
   }
 
-
+  function handleNextDay() {
+    history.push(`/dashboard?date=${next(date)}`);
+  }
 
   return (
     <main>
       <h1 className="d-md-flex justify-content-center">Dashboard</h1>
       <div className="d-md-flex mb-3 justify-content-center">
-        <h4 className="mb-0">Reservations for {date}</h4>
+        <h2 className="mb-0">Reservations for {date}</h2>
       </div>
       <div className="pb-2 d-flex justify-content-center">
-        <button className="btn btn-primary mr-1" onClick={handlePreviousDay}>
+        <button className="btn btn-dark mr-1" onClick={handlePreviousDay}>
           previous
         </button>
-        <button className="btn btn-primary mr-1" onClick={handleToday}>
+        <button className="btn btn-dark mr-1" onClick={handleToday}>
           today
         </button>
-        <button className="btn btn-primary" onClick={handleNextDay}>
+        <button className="btn btn-dark" onClick={handleNextDay}>
           next
         </button>
       </div>
-      <ErrorAlert error={reservationsError} />
-      <ReservationList
-        reservations={reservations}
-        setReservations={setReservations}
-        setError={setReservationsError}
+      <ErrorAlert error ={reservationsError} />
+      <ListTables
+          reservations={reservations}
+          setReservations={setReservations}
+          setError={setReservationsError}
       />
       <div>
         <ListTables tables={tables} loadDashboard={loadDashboard} />

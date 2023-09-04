@@ -1,9 +1,7 @@
 import React from "react";
+import TableFinishButton from "./tableFinishButton"; 
 
-
-
-
-function ListTables({ tables }) {
+function ListTables({ tables, loadDashboardFunction }) {
   if (!tables) {
     return null;
   }
@@ -16,6 +14,11 @@ function ListTables({ tables }) {
         <td>{table.table_name}</td>
         <td>{table.capacity}</td>
         <td data-table-id-status={table.table_id}>{status}</td>
+        {status === "Occupied" && (
+          <td>
+            <TableFinishButton table={table} loadDashboard={loadDashboardFunction} />
+          </td>
+        )}
       </tr>
     );
   });
@@ -29,6 +32,7 @@ function ListTables({ tables }) {
             <th scope="col">Table</th>
             <th scope="col">Capacity</th>
             <th scope="col">Status</th>
+            <th scope="col">Actions</th> 
           </tr>
         </thead>
         <tbody>{formatTable}</tbody>
@@ -36,6 +40,5 @@ function ListTables({ tables }) {
     </div>
   );
 }
-
 
 export default ListTables;

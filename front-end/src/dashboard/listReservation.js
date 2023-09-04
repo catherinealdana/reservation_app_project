@@ -1,47 +1,69 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { listAllReservations } from "../utils/api";
+import React from "react";
 
-const ReservationList = () => {
-    const [reservations, setReservations] = useState([]);
-    const [error, setError] = useState(null);
 
-    useEffect(() => {
-        const loadReservations = async () => {
-            try {
-                const response = await listAllReservations({});
-                setReservations(response);
-            } catch (error) {
-                setError(error);
-            }
-        };
-        loadReservations();
-    }, []);
+function ReservationList({ reservations, setReservations, setError }) {
+  if (!reservations) {
+    return null;
+  }
 
+const formatted = reservations.map((res) => {
     return (
-        <div>
-            <h2>All Reservations</h2>
-            {error ? (
-                <p>Error loading reservations: {error.message}</p>
-            ) : (
-                <ul>
-                    {reservations.map((reservation) => (
-                        <li key={reservation.reservation_id}>
-                            <strong>Reservation ID:</strong> {reservation.reservation_id}<br />
-                            <strong>Name:</strong> {reservation.first_name} {reservation.last_name}<br />
-                            <strong>Date:</strong> {reservation.reservation_date}<br />
-                            <strong>Time:</strong> {reservation.reservation_time}<br />
-                            <strong>Party Size:</strong> {reservation.people}<br />
-                            <Link to={`/reservations/${reservation.reservation_id}/seat`}>
-                                <button>Seat</button>
-                            </Link>
-                            <hr />
-                        </li>
-                    ))}
-                </ul>
-            )}
-        </div>
+      <tr key={res.reservation_id}>
+        <th scope="row">{res.reservation_id}</th>
+        <td>{res.first_name}</td>
+        <td>{res.last_name}</td>
+        <td>{res.mobile_number}</td>
+        <td>{res.people}</td>
+        <td>{res.reservation_time}</td>
+        <td data-reservation-id-status={res.reservation_id}>
+          {res.status}
+        </td>
+        <td>
+          {res.status === "booked" ? (
+            <a
+              className="btn btn-secondary"
+              role="button"
+              href={`/reservations/${res.reservation_id}/seat`}
+            >
+              Seat
+            </a>
+          ) : null}
+        </td>
+        <td>
+          <a
+            className="btn btn-secondary"
+            role="button"
+            href={`/reservations/${res.reservation_id}/edit`}
+          >
+            Edit
+          </a>
+        </td>
+      </tr>
     );
-};
+  });
+
+  return (
+    <>
+      <table className="table table-sm table-striped table-bordered">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">First</th>
+            <th scope="col">Last</th>
+            <th scope="col">Number</th>
+            <th scope="col">Guests</th>
+            <th scope="col">Time</th>
+            <th scope="col">Status</th>
+            <th scope="col">Seat</th>
+            <th scope="col">Edit</th>
+            <th scope="col">Cancel</th>
+          </tr>
+        </thead>
+        <tbody>{formatted}</tbody>
+      </table>
+    </>
+  );
+}
 
 export default ReservationList;
+

@@ -6,7 +6,7 @@ import NotFound from "./NotFound";
 import { today } from "../utils/date-time";
 import ReservationForm from "../createReservations/reservationForm";
 import Seat from "../seatReservations/Seat";
-import CreateTable from "../reservationTables/Tables";
+import CreateTable from "../reservationTables/tables";
 
 /**
  * Defines all the routes for the application.
