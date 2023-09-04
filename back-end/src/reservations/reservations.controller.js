@@ -218,6 +218,18 @@ function isWithinOpenHours(req, res, next) {
 
 
 
+  
+function isValidStatus(req, res, next) {
+  const VALID_STATUSES = ["booked", "seated", "finished", "cancelled"];
+  const { status } = req.body.data;
+  if (!VALID_STATUSES.includes(status)) {
+    return next({ status: 400, message: "Status unknown." });
+  }
+  next();
+}
+
+
+
 
 
 
