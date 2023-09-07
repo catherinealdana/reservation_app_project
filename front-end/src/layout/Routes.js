@@ -5,7 +5,7 @@ import Dashboard from "../dashboard/Dashboard";
 import NotFound from "./NotFound";
 import { today } from "../utils/date-time";
 import Seat from "../seatReservations/Seat";
-import CreateTable from "../reservationTables/tables";
+import CreateTable from "../reservationTables/Tables";
 import Edit from "../createReservations/updateReservationForm";
 import Search from "../searchReservation/search";
 import CreateReservationForm from "../createReservations/createReservationForm"

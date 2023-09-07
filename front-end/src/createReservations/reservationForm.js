@@ -83,7 +83,6 @@ function ReservationForm({formData, handleFormChange,handleSubmit }) {
             className="form-control"
             name="reservation_time"
             id="reservation_time"
-            placeholder={formData?.reservation_time || "HH:MM"}
             value={formData?.reservation_time}
             onChange={handleFormChange}
             required
