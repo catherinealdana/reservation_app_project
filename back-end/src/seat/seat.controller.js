@@ -24,6 +24,7 @@ async function unSeated(req, res, next) {
 }
 
 
+
 //MIDDLEWARE FUNCTIONS 
 
 //the table has a reservation Id
@@ -111,3 +112,4 @@ module.exports = {
     asyncErrorBoundary(ifTableAvailable), 
     asyncErrorBoundary(unSeated)],
 };
+

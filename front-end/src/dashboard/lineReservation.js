@@ -1,12 +1,32 @@
+
 import React from "react";
+import { cancelReservation } from "../utils/api";
+import { useHistory } from "react-router-dom";
 
-
-function ReservationList({ reservations, setReservations, setError }) {
-  if (!reservations) {
-    return null;
+export default function ReservationList({
+  reservations,
+  setReservations,
+  setError,
+}) {
+  const history = useHistory();
+  
+  async function cancelRes(reservation) {
+    try {
+      const { status } = await cancelReservation(reservation.reservation_id);
+      const updated = reservations.map((res) => {
+        if (res.reservation_id === reservation.reservation_id) {
+          res.status = status;
+        }
+        return res;
+      });
+      setReservations(updated);
+      history.go(`/dashboard?date=${reservation.reservation_date}`);
+    } catch (error) {
+      setError(error);
+    }
   }
 
-const formatted = reservations.map((res) => {
+  const formatted = reservations.map((res) => {
     return (
       <tr key={res.reservation_id}>
         <th scope="row">{res.reservation_id}</th>
@@ -38,9 +58,26 @@ const formatted = reservations.map((res) => {
             Edit
           </a>
         </td>
+        <td>
+          <button
+            className="btn btn-danger"
+            data-reservation-id-cancel={res.reservation_id}
+            onClick={() => handleCancel(res)}
+          >
+            Cancel
+          </button>
+        </td>
       </tr>
     );
   });
+
+  function handleCancel(reservation) {
+    return window.confirm(
+      "Do you want to cancel this reservation? This cannot be undone."
+    )
+      ? cancelRes(reservation)
+      : null;
+  }
 
   return (
     <>
@@ -64,6 +101,3 @@ const formatted = reservations.map((res) => {
     </>
   );
 }
-
-export default ReservationList;
-

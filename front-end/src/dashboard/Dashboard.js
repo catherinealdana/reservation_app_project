@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import ErrorAlert from "../layout/ErrorAlert";
 import {useHistory} from "react-router-dom"
 import { listReservations,listAllTables } from "../utils/api";
-import { previous,next } from "../utils/date-time";
+import { previous,next,today } from "../utils/date-time";
 import ListTables from "./TablesinDashboard/listTables";
+import ReservationList from "./lineReservation";
+
 /**
  * Defines the dashboard page.
  * @param date
@@ -18,6 +20,8 @@ function Dashboard({ date }) {
 
   useEffect(loadDashboard, [date]);
 
+
+
   function loadDashboard() {
     const controller = new AbortController();
     setReservationsError(null);
@@ -30,12 +34,11 @@ function Dashboard({ date }) {
   }
 
   function handleToday() {
-    history.push(`/dashboard`);
+    history.push(`/dashboard?date=${today()}`);
   }
 
   function handlePreviousDay() {
-    const newDate = previous(date);
-    history.push(`/dashboard?date=${newDate}`);
+    history.push(`/dashboard?date=${previous(date)}`);
   }
 
   function handleNextDay() {
@@ -60,11 +63,12 @@ function Dashboard({ date }) {
         </button>
       </div>
       <ErrorAlert error ={reservationsError} />
-      <ListTables
-          reservations={reservations}
-          setReservations={setReservations}
-          setError={setReservationsError}
+      <ReservationList
+        reservations={reservations}
+        setReservations={setReservations}
+        setError={setReservationsError}
       />
+      
       <div>
         <ListTables tables={tables} loadDashboard={loadDashboard} />
       </div>

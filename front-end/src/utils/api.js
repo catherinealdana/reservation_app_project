@@ -80,6 +80,28 @@ export async function listReservations(params, signal) {
  * @returns {Promise}
  *  a promise that resolves to the created reservation data
  */
+
+// export async function createReservation(reservation) {
+//   const url = new URL(`${API_BASE_URL}/reservations`);
+//   const options = {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json", 
+//      },
+//     body: JSON.stringify(reservation), 
+//   };
+//   try {
+//     const response = await fetch(url, options);
+//     if (!response.ok) {
+//       const errorData = await response.json(); 
+//       throw new Error(errorData.message || "An error occurred.");
+//     }
+
+//     return await response.json();
+//   } catch (error) {
+//     throw error; 
+//   }
+// }
 export async function createReservation(reservationData, signal) {
   const url = new URL(`${API_BASE_URL}/reservations`);
   const options = {
@@ -90,6 +112,7 @@ export async function createReservation(reservationData, signal) {
   };
   return await fetchJson(url, options);
 }
+
 
 //adding function to create a new table 
 
@@ -143,7 +166,53 @@ export async function releaseTable(table_id, reservation_id, signal) {
 }
 
 
+//to find reservation 
 
+
+export async function findReservation(reservation_id, signal) {
+  const url = new URL(`${API_BASE_URL}/reservations/${reservation_id}`);
+  return await fetchJson(url, { headers, signal }, [])
+    .then(formatReservationDate)
+    .then(formatReservationTime);
+}
+
+
+//Updates reservation info
+
+export async function modifyReservation(id, res, signal) {
+  const url = new URL(`${API_BASE_URL}/reservations/${id}`);
+  const options = {
+    method: "PUT",
+    headers,
+    body: JSON.stringify({ data: res }),
+    signal,
+  };
+  return await fetchJson(url, options, []);
+}
+
+
+//to cancel a reservation
+export async function cancelReservation(reservation_id) {
+  const url = new URL(`${API_BASE_URL}/reservations/${reservation_id}/status`);
+  const options = {
+    method: "PUT",
+    headers,
+    body: JSON.stringify({ data: { status: "cancelled" } }),
+  };
+  return await fetchJson(url, options, []);
+}
+
+
+// export async function isAfterCloseTime(reservationTime) {
+//   // Define the close time as a constant
+//   const closeTime = new Date(`1970-01-01T21:30:00`); // Adjust this to your actual close time
+
+//   // Parse the reservation time string to a Date object
+//   const reservationDateTime = new Date(`1970-01-01T${reservationTime}`);
+
+//   // Compare the reservation time with the close time
+//   return reservationDateTime > closeTime;
+// }
 
 
 

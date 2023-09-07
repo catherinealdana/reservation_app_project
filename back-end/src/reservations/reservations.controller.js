@@ -88,12 +88,32 @@ function validateTime(string) {
   if (hour.length > 2 || minute.length > 2) {
     return false;
   }
-  if (hour < 1 || hour > 23) {
+  if (hour < 0 || hour > 23) {
     return false;
   }
   if (minute < 0 || minute > 59) {
     return false;
   }
+  
+  const now = new Date();
+  const reservationTime = new Date();
+  
+  reservationTime.setHours(hour);
+  reservationTime.setMinutes(minute);
+  
+  const openingTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 10, 30);
+  if (reservationTime < openingTime) {
+    return false;
+  }
+
+  const closingTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 21, 30);
+  if (reservationTime > closingTime) {
+    return false;
+  }
+  if (reservationTime <= now) {
+    return false;
+  }
+  
   return true;
 }
 
@@ -124,6 +144,7 @@ function isValidReservation(req, res, next) {
         return next({ status: 400, message: `${field} is not a valid time.` });
       }
     }
+
   });
 
   next();
@@ -134,13 +155,11 @@ function isValidReservation(req, res, next) {
 
 function isNotTuesday(req, res, next) {
   const { reservation_date } = req.body.data;
-  console.log("date", reservation_date)
   const [year, month, day] = reservation_date.split("-");
-  const date = new Date(`${month}-${day}-${year}`);
+  const date = new Date(`${month} ${day}, ${year}`);
   res.locals.date = date;
   if (date.getDay() === 2) {
-    console.log("tuesday validation failed")
-    return next({ status: 400, message: "Location is closed on Tuesdays." });
+    return next({ status: 400, message: "Location is closed on Tuesdays" });
   }
   next();
 }
@@ -151,8 +170,7 @@ function isFutureOnly(req, res, next) {
   const date = res.locals.date;
   const today = new Date();
   if (date < today) {
-    console.log("tuesday validation failed")
-    return next({ status: 400, message: "Must be a future date." });
+    return next({ status: 400, message: "Must be a future date" });
   }
   next();
 }
@@ -180,24 +198,18 @@ const reservationExists = async (req, res, next) => {
 function isWithinOpenHours(req, res, next) {
   const reservation = req.body.data;
   const [hour, minute] = reservation.reservation_time.split(":");
-  
-  if (hour < 10 || hour > 20) {
-    return next({
-      status: 400,
-      message: "Reservation must be made within business hours.",
-    });
-  }
-  
-  if (
-    (hour === 10 && minute < 30) ||  
-    (hour === 20 && minute > 30)      
-  ) {
+  if (hour < 10 || hour > 21) {
     return next({
       status: 400,
       message: "Reservation must be made within business hours",
     });
   }
-  
+  if ((hour < 11 && minute < 30) || (hour > 20 && minute > 30)) {
+    return next({
+      status: 400,
+      message: "Reservation must be made within business hours",
+    });
+  }
   next();
 }
 
@@ -242,6 +254,8 @@ function finishedReservation(req, res, next) {
   }
   next();
 }
+
+
 
 
 

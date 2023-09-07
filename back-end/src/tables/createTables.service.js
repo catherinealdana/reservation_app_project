@@ -17,3 +17,4 @@ function read(table_id) {
 }
 
 module.exports = { list, create, read };
+

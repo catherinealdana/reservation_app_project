@@ -2,13 +2,14 @@ import React from "react";
 import { useHistory } from "react-router";
 import { releaseTable } from "../../utils/api";
 
-export default function TableFinishButton({ table, loadDashboard }) {
+export default function TableWithFinishButton({ table, loadDashboard }) {
+  const status = table.reservation_id ? "Occupied" : "Free";
   const history = useHistory();
 
-  const status = table.reservation_id ? "Occupied" : "Free";
-
   async function handleClick() {
-    return window.confirm("Is this table ready to seat new guests? This cannot be undone." )
+    return window.confirm(
+      "Is this table ready to seat new guests? This cannot be undone."
+    )
       ? await handleFinish(table.table_id, table.reservation_id)
       : null;
   }

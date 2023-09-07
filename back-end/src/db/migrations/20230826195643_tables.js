@@ -9,10 +9,9 @@ exports.up = function (knex) {
       .references("reservation_id")
       .inTable("reservations");
     table.timestamps(true, true);
-    table.string("status").defaultTo("booked");
   });
 };
 
 exports.down = function (knex) {
-  return knex.schema.dropTable("tables");
+  return knex.schema.dropTableIfExists("tables");
 };

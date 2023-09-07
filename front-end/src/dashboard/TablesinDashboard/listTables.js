@@ -1,25 +1,14 @@
 import React from "react";
-import TableFinishButton from "./tableFinishButton"; 
+import TableWithFinishButton from "./tableFinishButton";
 
-function ListTables({ tables, loadDashboardFunction }) {
+export default function ListTables({ tables, loadDashboard }) {
   if (!tables) {
     return null;
   }
 
-  const formatTable = tables.map((table) => {
-    const status = table.reservation_id ? "Occupied" : "Free";
+  const formatted = tables.map((table) => {
     return (
-      <tr key={table.table_id}>
-        <th scope="row">{table.table_id}</th>
-        <td>{table.table_name}</td>
-        <td>{table.capacity}</td>
-        <td data-table-id-status={table.table_id}>{status}</td>
-        {status === "Occupied" && (
-          <td>
-            <TableFinishButton table={table} loadDashboard={loadDashboardFunction} />
-          </td>
-        )}
-      </tr>
+      <TableWithFinishButton key={table.table_id} table={table} loadDashboard={loadDashboard} />
     );
   });
 
@@ -32,13 +21,11 @@ function ListTables({ tables, loadDashboardFunction }) {
             <th scope="col">Table</th>
             <th scope="col">Capacity</th>
             <th scope="col">Status</th>
-            <th scope="col">Actions</th> 
+            <th scope="col">Finish</th>
           </tr>
         </thead>
-        <tbody>{formatTable}</tbody>
+        <tbody>{formatted}</tbody>
       </table>
     </div>
   );
 }
-
-export default ListTables;

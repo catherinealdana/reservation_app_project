@@ -1,4 +1,3 @@
-const { select } = require("../db/connection");
 const knex = require("../db/connection");
 
 
@@ -74,31 +73,22 @@ function search(mobile_number) {
 //if the user wants to update reservation 
 
 async function modify(reservation_id, reservation) {
-    const updated = await knex("reservations")
-        .select("*")
-        .where({ reservation_id })
-        .update(reservation, "*")
-        .returning("*");
-    return updated[0];
-  }
-
-module.exports={
-    create,
-    read, 
-    list,
-    listByDate,
-    update,
-    finish,
-    search,
-    modify
-    }
+  const updated = await knex("reservations")
+    .select("*")
+    .where({ reservation_id })
+    .update(reservation, "*")
+    .returning("*");
+  return updated[0];
+}
 
 
-
-
-
-
-
-
-
-
+module.exports = {
+  list,
+  create,
+  listByDate,
+  read,
+  finish,
+  update,
+  search,
+  modify,
+};

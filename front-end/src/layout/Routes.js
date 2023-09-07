@@ -4,10 +4,11 @@ import { Redirect, Route, Switch } from "react-router-dom";
 import Dashboard from "../dashboard/Dashboard";
 import NotFound from "./NotFound";
 import { today } from "../utils/date-time";
-import ReservationForm from "../createReservations/reservationForm";
 import Seat from "../seatReservations/Seat";
 import CreateTable from "../reservationTables/tables";
-
+import Edit from "../createReservations/updateReservationForm";
+import Search from "../searchReservation/search";
+import CreateReservationForm from "../createReservations/createReservationForm"
 /**
  * Defines all the routes for the application.
  *
@@ -27,8 +28,11 @@ function Routes() {
       <Route exact path="/reservations/:reservation_id/seat">
         <Seat />
       </Route>
+      <Route exact path="/reservations/:reservation_id/edit">
+        <Edit />
+      </Route>
       <Route exact path="/reservations/new">
-        <ReservationForm />
+        <CreateReservationForm />
       </Route>
       <Route exact={true} path="/reservations">
         <Redirect to={"/dashboard"} />
@@ -38,6 +42,9 @@ function Routes() {
       </Route>
       <Route path="/tables/new">
         <CreateTable />
+      </Route>
+      <Route path="/search">
+        <Search />
       </Route>
       <Route>
         <NotFound />
