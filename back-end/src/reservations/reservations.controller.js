@@ -33,7 +33,7 @@ async function list(req, res) {
 //creation reservation controller 
 
 async function create(req, res) {
-  console.log(req.body.data)
+  //console.log(req.body.data)
   const reservation = req.body.data;
   const { reservation_id } = await service.create(reservation);
   reservation.reservation_id = reservation_id;
@@ -96,24 +96,6 @@ function validateTime(string) {
     return false;
   }
   
-  // const now = new Date();
-  // const reservationTime = new Date();
-  
-  // reservationTime.setHours(hour);
-  // reservationTime.setMinutes(minute);
-  
-  // const openingTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 10, 30);
-  // if (reservationTime < openingTime) {
-  //   return false;
-  // }
-
-  // const closingTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 21, 30);
-  // if (reservationTime > closingTime) {
-  //   return false;
-  // }
-  // if (reservationTime <= now) {
-  //   return false;
-  // }
   
   return true;
 }
