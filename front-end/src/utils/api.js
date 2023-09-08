@@ -102,12 +102,12 @@ export async function listReservations(params, signal) {
 //     throw error; 
 //   }
 // }
-export async function createReservation(reservationData, signal) {
+export async function createReservation(reservation, signal) {
   const url = new URL(`${API_BASE_URL}/reservations`);
   const options = {
     method: "POST",
     headers,
-    body: JSON.stringify({ data: reservationData}),
+    body: JSON.stringify({ data: reservation}),
     signal,
   };
   return await fetchJson(url, options);

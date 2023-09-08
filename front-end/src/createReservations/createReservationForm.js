@@ -38,8 +38,8 @@ function CreateReservationForm() {
 
       const handleSubmit = async (e) => {
         e.preventDefault();
-        // console.log(formData)
-        // console.log("handleSubmit call")
+        console.log(formData)
+        console.log("handleSubmit call")
         const controller = new AbortController();
         const errors = [];
 
@@ -57,8 +57,8 @@ function CreateReservationForm() {
           history.push(`/dashboard?date=${date}`);
         } catch (error) {
           setReservationsError(error);
-         // setReservationsError(new Error('Reservation time must be before 9:30 PM.'));
-          console.error( error);
+        //  setReservationsError(new Error('Reservation time must be before 9:30 PM.'));
+        //   console.error( error);
         }
         return () => controller.abort();
       };
