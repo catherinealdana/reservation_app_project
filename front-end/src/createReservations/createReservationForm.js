@@ -38,8 +38,8 @@ function CreateReservationForm() {
 
       const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(formData)
-        console.log("handleSubmit call")
+        // console.log(formData)
+        // console.log("handleSubmit call")
         const controller = new AbortController();
         const errors = [];
 
@@ -52,7 +52,6 @@ function CreateReservationForm() {
         }
         try {
           formData.people = Number(formData.people);
-          console.log("creating reservation")
           await createReservation(formData, controller.signal);
           const date = formData.reservation_date;
           history.push(`/dashboard?date=${date}`);
