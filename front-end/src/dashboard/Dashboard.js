@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import ErrorAlert from "../layout/ErrorAlert";
 import {useHistory} from "react-router-dom"
 import { listReservations,listAllTables } from "../utils/api";
-import { previous,next,today } from "../utils/date-time";
+import { previous,next } from "../utils/date-time";
 import ListTables from "./TablesinDashboard/listTables";
 import ReservationList from "./lineReservation";
 
@@ -34,7 +34,7 @@ function Dashboard({ date }) {
   }
 
   function handleToday() {
-    history.push(`/dashboard?date=${today()}`);
+    history.push(`/dashboard`);
   }
 
   function handlePreviousDay() {
