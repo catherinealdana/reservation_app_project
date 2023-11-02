@@ -1,5 +1,7 @@
 
-Live here 🪁 : https://restaurant-res-app.onrender.com
+Live here 🪁 : https://restaurant-res-app.onrender.com 
+
+(Just a quick heads up, it's a free deployment system, so it'll be ready in a sec. Thanks for your patience!)
 
 # Capstone: Restaurant Reservation System
 
